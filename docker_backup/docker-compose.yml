@@ -1,0 +1,63 @@
+version: '2.3'
+services:
+  spark-master:
+    image: my-spark:0.0.1
+    ports:
+      - "9190:8080"
+      - "7177:7077"
+    volumes:
+       - /Users/tonyguo-mba/Documents/github/apache-spark-note/logdata:/opt/spark/work-dir/spark-data
+    environment:
+      - SPARK_LOCAL_IP=spark-master
+      - SPARK_WORKLOAD=master
+    entrypoint: "/bin/sh -c"
+    command: /entrypoint.sh
+    # command: ls /spark-data
+      
+  
+  spark-worker-a:
+    image: my-spark:0.0.1
+    ports:
+      - "9191:8080"
+      - "7100:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-a
+    volumes:
+       - /Users/tonyguo-mba/Documents/github/apache-spark-note/logdata:/opt/spark/work-dir/spark-data
+    entrypoint: "/bin/sh -c"
+    command: /entrypoint.sh
+  
+  spark-worker-b:
+    image: my-spark:0.0.1
+    ports:
+      - "9192:8080"
+      - "7101:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-b
+    volumes:
+        - /Users/tonyguo-mba/Documents/github/apache-spark-note/logdata:/opt/spark/work-dir/spark-data
+    entrypoint: "/bin/sh -c"
+    command: /entrypoint.sh
+
+  demo-database:
+    image: postgres:11.7-alpine
+    ports: 
+      - "5432:5432"
+    environment: 
+      - POSTGRES_PASSWORD=casa1234
